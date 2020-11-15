@@ -2,7 +2,7 @@ import urllib.request
 import os
 from tqdm import tqdm
 
-RAW_DATA_DIR='BBBC021/data/raw'
+RAW_DATA_DIR='data/raw'
 
 def gen_bar_updater(desc=None, leave=False):
     pbar = tqdm(total=None, leave=leave, desc=desc)
@@ -20,13 +20,14 @@ def download_file(url, dst_dir=None):
     file_path = filename
     if dst_dir is not None:
         file_path = os.path.join(dst_dir, filename)
-     
-    urllib.request.urlretrieve(
-        url, file_path,
-        reporthook=gen_bar_updater(desc=filename)
-    )
+    
+    if not os.path.exists(file_path):
+        urllib.request.urlretrieve(
+            url, file_path,
+            reporthook=gen_bar_updater(desc=filename)
+        )
         
-def download_raw_data(images_urls='bbbc021_images_urls.txt', metadata_urls='bbbc021_metadata_urls.txt'):
+def download_raw_data(images_urls='urls_images.txt', metadata_urls='urls_metadata.txt'):
     if not os.path.exists(RAW_DATA_DIR):
         os.mkdir(RAW_DATA_DIR)
         
