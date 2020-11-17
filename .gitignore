@@ -1,2 +1,3 @@
 .ipynb_checkpoints
 BBBC021/data/raw/images/*
+BBBC021/data/hdf5*

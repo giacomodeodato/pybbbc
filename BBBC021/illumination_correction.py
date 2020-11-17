@@ -59,10 +59,6 @@ for plate in plates:
                 img_avg = img_avg + img.astype(np.float32)
             img_avg = img_avg / len(filenames)
             
-            # and save resulting image
-            img_avg_path = os.path.join(illum_plate_dir, '{}_s{}_avg.npy'.format(channel, site))
-            np.save(img_avg_path, img_avg.astype(np.float16))
-            
             # Apply Gaussian filter of size 500 and rescale
             img_mask = gaussian_filter(img_avg, sigma=500)
             robust_min = np.percentile(img_mask[img_mask > 0], 0.02)
