@@ -6,28 +6,11 @@ import h5py
 from skimage import io
 from scipy.ndimage import gaussian_filter
 from datetime import datetime
-import sys
 from tqdm.auto import tqdm
-
-import time
-
-def msg(message, p, n_p, c=None, n_c=None, s=None, n_s=None):
-    prefix = '[Plate {:2}/{}]'.format(p, n_p)
-    if (c is not None) and (n_c is not None):
-        prefix += '[Channel {}/{}]'.format(c, n_c)
-        if (s is not None) and (n_s is not None):
-            prefix += '[Site {}/{}]'.format(s, n_s)
-    sys.stdout.write(prefix + ' ' + message)
-    
-def end_msg():
-    pass
-    #sys.stdout.write("\033[K")
-    #print(" done.\r", end='')
-    #print("\033[K", end='')
 
 IMG_SHAPE = (1024, 1280)
 CHANNELS = ['Actin', 'Tubulin', 'DAPI']
-DATA_DIR='data'
+DATA_DIR='BBBC021/data'
 str_dtype = h5py.string_dtype(encoding='utf-8')
 
 raw_data_dir = os.path.join(DATA_DIR, 'raw')
@@ -55,7 +38,7 @@ image_df = image_df.merge(
 ).fillna('null')
 plates = image_df.Image_Metadata_Plate_DAPI.unique().tolist()
 plates_tqdm = tqdm(total=len(plates), desc='Plates', leave=False)
-for plate in plates:
+for plate in plates[:3]:
     
     illum_plate_dir = os.path.join(illum_dir, plate)
     if not os.path.exists(illum_plate_dir):
@@ -156,5 +139,30 @@ for plate in plates:
             h5_file['moa'][(s-1)*len(site_df):s*len(site_df)] = site_df.moa.values
     channels_tqdm.close()
     plates_tqdm.update(1)
-plates_tqdm.set_description('finalizing')
+
+plates_tqdm.set_description('Finalizing')
+
+with h5py.File(os.path.join(hdf5_dir, os.listdir(hdf5_dir)[0]), 'r') as h5_file:
+    datasets = {
+        x: [h5_file[x].shape, h5_file[x].dtype]
+        for x in list(h5_file.keys())
+    }
+
+layouts = {
+    x: h5py.VirtualLayout(shape=(n_images,) + shape[1:], dtype=dtype)
+    for x, (shape, dtype) in datasets.items()
+}
+
+for i, filename in enumerate(os.listdir(hdf5_dir)[:3]):
+    file_path = os.path.join(hdf5_dir, filename)
+    for d, (s, _) in datasets.items():
+        layouts[d][i*s[0]:(i+1)*s[0]] = h5py.VirtualSource(file_path, d, s)
+        
+with h5py.File("bbbc021.h5", "w") as h5_file:
+    h5_file.attrs['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    h5_file.attrs['h5py_info'] = h5py.version.info
+    h5_file.attrs['dataset'] = 'bbbc021'
+    h5_file.attrs['website'] = 'https://bbbc.broadinstitute.org/BBBC021'
+    for name, layout in layouts.items():
+        h5_file.create_virtual_dataset(name, layout)
 plates_tqdm.close()
