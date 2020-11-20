@@ -1,3 +1,4 @@
 .ipynb_checkpoints
-bbbc021/data/raw/images/*
-bbbc021/data/hdf5*
+pybbbc/data/raw
+pybbbc/data/hdf5
+pybbbc/data/bbbc021.h5
