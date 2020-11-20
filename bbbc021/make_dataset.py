@@ -10,7 +10,7 @@ from tqdm.auto import tqdm
 
 IMG_SHAPE = (1024, 1280)
 CHANNELS = ['Actin', 'Tubulin', 'DAPI']
-DATA_DIR='BBBC021/data'
+DATA_DIR='data'
 str_dtype = h5py.string_dtype(encoding='utf-8')
 
 raw_data_dir = os.path.join(DATA_DIR, 'raw')
@@ -38,7 +38,7 @@ image_df = image_df.merge(
 ).fillna('null')
 plates = image_df.Image_Metadata_Plate_DAPI.unique().tolist()
 plates_tqdm = tqdm(total=len(plates), desc='Plates', leave=False)
-for plate in plates[:3]:
+for plate in plates:
     
     illum_plate_dir = os.path.join(illum_dir, plate)
     if not os.path.exists(illum_plate_dir):
@@ -102,7 +102,7 @@ for plate in plates[:3]:
             # and save resulting image
             img_mask_path = os.path.join(illum_plate_dir, '{}_s{}.npy'.format(channel, site))
             np.save(img_mask_path, img_mask)
-            
+
             # apply illumination correction
             channel_imgs[(site-1)*len(filenames):(site)*len(filenames)] = \
                 channel_imgs[(site-1)*len(filenames):(site)*len(filenames)] /\
@@ -149,7 +149,7 @@ with h5py.File(os.path.join(hdf5_dir, os.listdir(hdf5_dir)[0]), 'r') as h5_file:
     }
 
 layouts = {
-    x: h5py.VirtualLayout(shape=(n_images,) + shape[1:], dtype=dtype)
+    x: h5py.VirtualLayout(shape=(len(image_df),) + shape[1:], dtype=dtype)
     for x, (shape, dtype) in datasets.items()
 }
 
