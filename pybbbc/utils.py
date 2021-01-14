@@ -27,12 +27,20 @@ def download_file(url, dst_dir=None):
 
     file_path = filename
     if dst_dir is not None:
-        file_path = os.path.join(dst_dir, filename)    
-    urllib.request.urlretrieve(
-        url, file_path,
-        reporthook=bar_update
-    )
-    pbar.close()
+        file_path = os.path.join(dst_dir, filename)
+    if os.path.exists(file_path):
+        pbar.close()
+    else:
+        try:
+            urllib.request.urlretrieve(
+                url, file_path,
+                reporthook=bar_update
+            )
+        except:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        finally:
+            pbar.close()
     return file_path
 
 def correct_illumination(images, sigma=500, min_percentile=0.02):
