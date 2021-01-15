@@ -1,8 +1,8 @@
 <p align="center">
-    <img src="images/example_image.png" width="200" />
-    <img src="images/actin.png" width="200" />
-    <img src="images/tubulin.png" width="200" /> 
-    <img src="images/DAPI.png" width="200" />
+    <img src="images/example_image.png" width="200" title="Image sample" />
+    <img src="images/actin.png" width="200" title="Actin" />
+    <img src="images/tubulin.png" width="200" title="Tubulin" /> 
+    <img src="images/DAPI.png" width="200" title="DAPI" />
 </p>
 
 # pybbbc
@@ -94,14 +94,24 @@ This function will execute the following steps:
 * Create a virtual HDFS dataset (using h5py) associating the images to the corresponding metadata
 
 ### Illumination correction
-In order to compute the illumination correction function an image is created, consisting of the average of all the images taken at the same site and belonging to the same plate. This image is then smoothed using a Gaussian filter with sigma=500. A robust minimum is calculated as the 0.02 percentile of all the positive values of the average image, and all the pixel with smaller values are truncated. This image is finally divided by the robust minimum in order to have only values greater or equal to one so that the illumination correction can be applied by dividing the original image by the illumination function.
+In order to compute the illumination correction function, the average of all the images taken at the same site and belonging to the same plate is calculated. This image is then smoothed using a Gaussian filter with sigma=500. A robust minimum is calculated as the 0.02 percentile of all the positive values of the average image, and all the pixel with smaller values are truncated. This image is finally divided by the robust minimum in order to have only values greater or equal to one so that the illumination correction can be applied by dividing the original image by the illumination function.
 
 ```python
 def correct_illumination(images, sigma=500, min_percentile=0.02):
+
+    # calculate average of images belonging to the same site and plate
     img_avg = images.mean(axis=0)
+    
+    # apply Gaussian filter
     img_mask = gaussian_filter(img_avg, sigma=sigma)
+    
+    # calculate robust minimum
     robust_min = np.percentile(img_mask[img_mask > 0], min_percentile)
+    
+    # clip and scale pixel intensities
     img_mask[img_mask < robust_min] = robust_min
     img_mask = img_mask / robust_min
+    
+    # return corrected images
     return images / img_mask
 ```
