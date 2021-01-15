@@ -11,14 +11,31 @@ from pybbbc import BBBC021
 bbbc021 = BBBC021()
 ```
 ### Indexing
+Standard indexing (i.e. ```bbbc021[3]``` or ```bbbc021[2:5]```) can be used to access samples and subsets. A single sample is a tuple ```(image, metadata)``` where the metadata is a tuple itself of plate metadata and compound metadata using the following structure:
+```python
+metadata = (
+    ( # plate metadata
+        site,
+        well,
+        replicate,
+        plate
+    ), 
+    ( # compound metadata
+        compound,
+        concentration,
+        moa
+    )
+)
+```
+
 
 ### Filtering
-The instance of dataset can be intuitively filtered during the initiation using metadata keyword arguments as follows.
+The instance of dataset can be intuitively filtered during the initiation using metadata keyword arguments as follows:
 ```python
 # get the samples without MoA
 bbbc021 = BBBC021(moa='null')
 ```
-or using a list of metadata values
+or using a list of metadata values:
 ```python
 # get the samples with the colchicine and latrunculin B compounds
 bbbc021 = BBBC021(compound=['colchicine', 'latrunculin B'])
@@ -26,7 +43,7 @@ bbbc021 = BBBC021(compound=['colchicine', 'latrunculin B'])
 # get the samples with only a selection of Mechanisms of Action
 bbbc021 = BBBC021(moa=['Actin disruptors', 'DMSO', 'Microtubule destabilizers'])
 ```
-The dataset can be filtered using any metadata keyword: ```site```, ```well```, ```replicate```, ```plate```, ```compound```, ```concentration``` and ```moa```. The unique values of the most relevant keywords are stored as static attributes: ```BBBC021.PLATES```, ```BBBC021.COMPOUNDS``` and ```BBBC021.MOA```. Other useful static attributes are ```BBBC021.IMG_SHAPE```, ```BBBC021.CHANNELS``` and ```BBBC021.N_SITES```
+The dataset can be filtered using any metadata keyword: ```site```, ```well```, ```replicate```, ```plate```, ```compound```, ```concentration``` and ```moa```. The unique values of the most relevant keywords are stored as static attributes: ```BBBC021.PLATES```, ```BBBC021.COMPOUNDS``` and ```BBBC021.MOA```. Other useful static attributes are ```BBBC021.IMG_SHAPE```, ```BBBC021.CHANNELS``` and ```BBBC021.N_SITES```.
 
 ### Sub-datasets
 The individual sub-datasets and their corresponding samples can be accessed as well after initiation:
