@@ -10,7 +10,10 @@ from pybbbc import BBBC021
 
 bbbc021 = BBBC021()
 ```
-The instance of dataset can be filtered during the initiation using metadata keyword arguments as follows.
+### Indexing
+
+### Filtering
+The instance of dataset can be intuitively filtered during the initiation using metadata keyword arguments as follows.
 ```python
 # get the samples without MoA
 bbbc021 = BBBC021(moa='null')
@@ -23,7 +26,23 @@ bbbc021 = BBBC021(compound=['colchicine', 'latrunculin B'])
 # get the samples with only a selection of Mechanisms of Action
 bbbc021 = BBBC021(moa=['Actin disruptors', 'DMSO', 'Microtubule destabilizers'])
 ```
-The dataset can be filtered using any metadata keyword: ```site```, ```well```, ```replicate```, ```plate```, ```compound```, ```concentration``` and ```moa```. The unique values of the most relevant keywords are stored as static attributes: ```BBBC021.PLATES```, ```BBBC021.COMPOUNDS``` and ```BBBC021.MOA```.
+The dataset can be filtered using any metadata keyword: ```site```, ```well```, ```replicate```, ```plate```, ```compound```, ```concentration``` and ```moa```. The unique values of the most relevant keywords are stored as static attributes: ```BBBC021.PLATES```, ```BBBC021.COMPOUNDS``` and ```BBBC021.MOA```. Other useful static attributes are ```BBBC021.IMG_SHAPE```, ```BBBC021.CHANNELS``` and ```BBBC021.N_SITES```
+
+### Sub-datasets
+The individual sub-datasets and their corresponding samples can be accessed as well after initiation:
+```python
+bbbc021 = BBBC021()
+
+img = bbbc021.images[0]
+
+# bbbc021.wells
+# bbbc021.sites
+# bbbc021.replicates
+# bbbc021.plates
+# bbbc021.compounds
+# bbbc021.concentrations
+# bbbc021.moa
+```
 
 ## Data download
 The raw data (13,200 fields of view imaged in three channels) can be downloaded after importing the BBBC021 dataset as follows:
