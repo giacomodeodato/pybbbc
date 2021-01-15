@@ -1,3 +1,10 @@
+<p align="center">
+    <img src="images/example_image.png" width="200" />
+    <img src="images/actin.png" width="200" />
+    <img src="images/tubulin.png" width="200" /> 
+    <img src="images/DAPI.png" width="200" />
+</p>
+
 # pybbbc
 This is a python interface to the BBBC021 dataset of cellular images ([Caie et al., Molecular Cancer Therapeutics, 2010](http://dx.doi.org/10.1158/1535-7163.MCT-09-1148)), available from the Broad Bioimage Benchmark Collection ([Ljosa et al., Nature Methods, 2012](http://dx.doi.org/10.1038/nmeth.2083)).
 
