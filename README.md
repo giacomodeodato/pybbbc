@@ -1,6 +1,8 @@
 # pybbbc
 This is a python interface to the BBBC021 dataset of cellular images ([Caie et al., Molecular Cancer Therapeutics, 2010](http://dx.doi.org/10.1158/1535-7163.MCT-09-1148)), available from the Broad Bioimage Benchmark Collection ([Ljosa et al., Nature Methods, 2012](http://dx.doi.org/10.1038/nmeth.2083)).
 
+The dataset is made of 13,200 fields of view imaged in three channels of resolution 1024x1280 and the corresponding metadata: site, well, replicate, plate, compound, concentration and mechanism of action (MoA).
+
 The images are of MCF-7 breast cancer cells treated for 24 h with a collection of 113 small molecules at eight concentrations. The cells were fixed, labeled for DNA, F-actin, and Β-tubulin, and imaged by fluorescent microscopy. The complete description of the dataset can be found [here](https://bbbc.broadinstitute.org/BBBC021).
 
 ## Usage
@@ -30,7 +32,7 @@ metadata = (
 
 
 ### Filtering
-The instance of dataset can be intuitively filtered during the initiation using metadata keyword arguments as follows:
+The instance of a dataset can be intuitively filtered during the initiation using metadata keyword arguments as follows:
 ```python
 # get the samples without MoA
 bbbc021 = BBBC021(moa='null')
@@ -62,7 +64,7 @@ img = bbbc021.images[0]
 ```
 
 ## Data download
-The raw data (13,200 fields of view imaged in three channels) can be downloaded after importing the BBBC021 dataset as follows:
+The raw data can be downloaded after importing the BBBC021 dataset as follows:
 ```python
 from pybbbc import BBBC021
 
