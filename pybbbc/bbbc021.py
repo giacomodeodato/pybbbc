@@ -122,7 +122,7 @@ class BBBC021:
         
         index = self.index_vector[index]
 
-        img = self.dataset['images'][index]
+        img = self.dataset['images'][index].astype(np.float32)
         site = self.dataset['site'][index]
         well = self.dataset['well'][index]
         replicate = self.dataset['replicate'][index]
