@@ -1,6 +1,4 @@
 .ipynb_checkpoints
 .__pycache__
-pybbbc/data/raw
-pybbbc/data/hdf5
-pybbbc/data/bbbc021.h5
+.*.ipynb
 data
