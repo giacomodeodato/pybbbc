@@ -114,9 +114,9 @@ class BBBC021:
                 bool_vector = np.zeros_like(self.index_vector)
                 for e in v:
                     bool_vector = bool_vector + np.array(self.dataset[k][self.index_vector] == e)
-                self.index_vector = np.where(bool_vector)[0]
+                self.index_vector = self.index_vector[np.nonzero(bool_vector)[0]]
             else:
-                self.index_vector = np.where(self.dataset[k][self.index_vector] == v)[0]
+                self.index_vector = self.index_vector[np.where(self.dataset[k][self.index_vector] == v)[0]]
 
     def __getitem__(self, index):
         
