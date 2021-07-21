@@ -433,8 +433,9 @@ class BBBC021:
         if data_path is None:
             data_path = os.getcwd()
 
-        urls_images = 'https://raw.githubusercontent.com/giacomodeodato/pybbbc/main/pybbbc/data/urls_images.txt'
-        urls_metadata = 'https://raw.githubusercontent.com/giacomodeodato/pybbbc/main/pybbbc/data/urls_metadata.txt'
+        # TODO: Include these with the package install via setup.py
+        urls_images = 'https://raw.githubusercontent.com/zbarry/pybbbc/main/metadata/urls_images.txt'
+        urls_metadata = 'https://raw.githubusercontent.com/zbarry/pybbbc/main/metadata/urls_metadata.txt'
 
         # create data directories
         data_dir = os.path.join(data_path, 'data')
