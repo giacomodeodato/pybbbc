@@ -12,6 +12,12 @@ The dataset is made of 13,200 fields of view imaged in three channels of resolut
 
 The images are of MCF-7 breast cancer cells treated for 24 h with a collection of 113 small molecules at eight concentrations. The cells were fixed, labeled for DNA, F-actin, and Β-tubulin, and imaged by fluorescent microscopy. The complete description of the dataset can be found [here](https://bbbc.broadinstitute.org/BBBC021).
 
+## Installation
+
+```bash
+pip install git+https://github.com/giacomodeodato/pybbbc.git
+```
+
 ## Usage
 An instance of the dataset can be easily created with the following code:
 ```python
