@@ -95,7 +95,7 @@ from pybbbc import BBBC021
 
 BBBC021.download()
 ```
-This will automatically create the data folder in the current working directory and download images and metadata (this may take several hours). Alternatively, it is possible to specify the ```data_path``` parameter to set the destination folder.
+This will automatically create the data folder in `~/.cache/` (by default) and download images and metadata (this may take several hours). Alternatively, it is possible to specify the ```data_path``` parameter to set the destination folder.
 
 ## Dataset creation
 After downloading the raw data, the preprocessed dataset can be created by calling the static method ```make_dataset()```.
