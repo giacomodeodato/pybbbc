@@ -8,7 +8,7 @@ from typing import Union
 import h5py
 import numpy as np
 
-import pybbbc.constants as constants
+from pybbbc import constants
 
 from .dataset import download, make_dataset
 

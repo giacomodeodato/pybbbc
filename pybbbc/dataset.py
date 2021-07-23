@@ -17,7 +17,7 @@ from skimage import io
 from tqdm.auto import tqdm
 from tqdm.contrib.concurrent import process_map
 
-import pybbbc.constants as constants
+from pybbbc import constants
 
 from .image import correct_illumination, scale_pixel_intensity
 from .utils import download_file, get_paths
