@@ -93,16 +93,18 @@ class BBBC021:
         index = self.index_vector[index]
 
         img = self.dataset["images"][index].astype(np.float32)
+
         site = self.dataset["site"][index]
-        well = self.dataset["well"][index]
+        well = self.dataset["well"][index].decode("utf-8")
         replicate = self.dataset["replicate"][index]
-        plate = self.dataset["plate"][index]
-        compound = self.dataset["compound"][index]
+        plate = self.dataset["plate"][index].decode("utf-8")
+
+        compound = self.dataset["compound"][index].decode("utf-8")
         concentration = self.dataset["concentration"][index]
-        moa = self.dataset["moa"][index]
+        moa = self.dataset["moa"][index].decode("utf-8")
 
         metadata = (
-            (site, well, replicate, plate),
+            (site, str(well), replicate, plate),
             (compound, concentration, moa),
         )
 

@@ -97,19 +97,19 @@ def make_dataset(root_path: Union[str, Path], max_workers: int = 8):
 
     metadata_df = get_metadata(moa_df, image_df)
 
-    # get plates and create progress bar
-    plates = metadata_df.Image_Metadata_Plate_DAPI.unique().tolist()
+    # # get plates and create progress bar
+    # plates = metadata_df.Image_Metadata_Plate_DAPI.unique().tolist()
 
-    process_map(
-        partial(
-            process_plate,
-            data_dir=data_dir,
-            hdf5_dir=hdf5_dir,
-            metadata_df=metadata_df,
-        ),
-        plates,
-        max_workers=max_workers,
-    )
+    # process_map(
+    #     partial(
+    #         process_plate,
+    #         data_dir=data_dir,
+    #         hdf5_dir=hdf5_dir,
+    #         metadata_df=metadata_df,
+    #     ),
+    #     plates,
+    #     max_workers=max_workers,
+    # )
 
     # create virtual hdf5 dataset
 
