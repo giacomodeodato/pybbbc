@@ -1,7 +1,7 @@
 <p align="center">
     <img src="images/example_image.png" width="200" title="Image sample" />
     <img src="images/actin.png" width="200" title="Actin" />
-    <img src="images/tubulin.png" width="200" title="Tubulin" /> 
+    <img src="images/tubulin.png" width="200" title="Tubulin" />
     <img src="images/DAPI.png" width="200" title="DAPI" />
 </p>
 
@@ -14,8 +14,20 @@ The images are of MCF-7 breast cancer cells treated for 24 h with a collection o
 
 ## Installation
 
+### With pip
+
 ```bash
 pip install git+https://github.com/giacomodeodato/pybbbc.git
+```
+
+### For development (with conda)
+
+```bash
+git clone git+https://github.com/giacomodeodato/pybbbc.git
+cd pybbbc
+conda env update
+conda activate pybbbc
+pre-commit install
 ```
 
 ## Usage
@@ -34,7 +46,7 @@ metadata = (
         well,
         replicate,
         plate
-    ), 
+    ),
     ( # compound metadata
         compound,
         concentration,
@@ -107,17 +119,17 @@ def correct_illumination(images, sigma=500, min_percentile=0.02):
 
     # calculate average of images belonging to the same site and plate
     img_avg = images.mean(axis=0)
-    
+
     # apply Gaussian filter
     img_mask = gaussian_filter(img_avg, sigma=sigma)
-    
+
     # calculate robust minimum
     robust_min = np.percentile(img_mask[img_mask > 0], min_percentile)
-    
+
     # clip and scale pixel intensities
     img_mask[img_mask < robust_min] = robust_min
     img_mask = img_mask / robust_min
-    
+
     # return corrected images
     return images / img_mask
 ```
