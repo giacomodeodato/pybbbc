@@ -9,6 +9,7 @@ import shutil
 from skimage import io
 from tqdm.auto import tqdm
 from .utils import download_file, correct_illumination, scale_pixel_intensity
+from pathlib import Path
 
 class BBBC021:
     """
@@ -92,18 +93,20 @@ class BBBC021:
         'Protein degradation', 'Protein synthesis', 'null'
     ]
 
-    def __init__(self, path='./data/bbbc021.h5', **kwargs):
+    def __init__(self, path='~/.cache/bbbc021/bbbc021.h5', **kwargs):
         """Initializes the BBBC021 dataset.
-            
+
         Args:
             path : str, optional
                 Path to the virtual HDF5 dataset.
-                Default is './data/bbbc021.h5'.
+                Default is '~/.cache/bbbc021/bbbc021.h5'.
 
         Returns: instance of the BBBC021 dataset
         """
 
-        if not os.path.exists(path):
+        path = Path(path).expanduser()
+
+        if not path.exists():
             raise RuntimeError("Dataset not found at '{}'.\n Use BBBC021.download() to download raw data and BBBC021.make_dataset() to preprocess and create the dataset.".format(path))
 
         self.dataset = h5py.File(path, 'r')
@@ -119,7 +122,7 @@ class BBBC021:
                 self.index_vector = self.index_vector[np.where(self.dataset[k][self.index_vector] == v)[0]]
 
     def __getitem__(self, index):
-        
+
         index = self.index_vector[index]
 
         img = self.dataset['images'][index].astype(np.float32)
@@ -184,7 +187,7 @@ class BBBC021:
     @staticmethod
     def make_dataset(data_path=None):
         """Creates a virtual HDF5 dataset with preprocessed images and metadata.
-        
+
         Data should be previously downloaded using BBBC021.download_raw_data().
 
         Args:
@@ -195,8 +198,8 @@ class BBBC021:
 
         def get_metadata():
             """Merges and preprocesses metadata files.
-            
-            Reads the image and moa metadata dataframes, creates the site 
+
+            Reads the image and moa metadata dataframes, creates the site
             column, merges the metadata and fills missing values with null.
 
             Returns : pandas.DataFrame
@@ -239,10 +242,10 @@ class BBBC021:
             with zipfile.ZipFile(file_path, 'r') as zip_ref:
                 zip_ref.extractall(images_dir)
             return os.path.join(images_dir, plate)
-                
+
         def process_channel(channel, plate_df, plate_dir, plate_h5):
             """Processes the channel images of a plate.
-            
+
             Computes and applies illumination correction per site.
             Scales pixel intensities.
             Saves the preprocessed images in the plate hdf5 file.
@@ -270,31 +273,31 @@ class BBBC021:
                     plate_df.Image_Metadata_Site == s,
                     'Image_FileName_{}'.format(channel)
                 ].tolist()
-                
+
                 # read images with site s
                 filenames_tqdm = tqdm(total=len(filenames), desc='Reading images', leave=False)
                 for i, filename in enumerate(filenames):
                     img = io.imread(os.path.join(plate_dir, filename)).astype(np.float16)
                     channel_imgs[(s-1)*len(filenames)+i] = img
                     filenames_tqdm.update(1)
-                
+
                 # compute and apply illumination correction
                 filenames_tqdm.set_description('Computing illumination correction')
                 channel_imgs[(s-1)*len(filenames):(s)*len(filenames)] = \
                     correct_illumination(channel_imgs[(s-1)*len(filenames):(s)*len(filenames)])
-                
+
                 filenames_tqdm.close()
                 sites_tqdm.update(1)
 
             # scale pixel intensities
             sites_tqdm.set_description('Scaling pixel values')
             channel_imgs = scale_pixel_intensity(channel_imgs)
-            
+
             # save preprocessed images
             sites_tqdm.set_description('Saving preprocessed images')
             with h5py.File(plate_h5, 'a') as h5_file:
                 h5_file['images'][:, c, ...] = channel_imgs
-                
+
             sites_tqdm.close()
 
         def make_virtual_dataset(vds_path, hdf5_dir, n_samples):
@@ -327,7 +330,7 @@ class BBBC021:
                 file_path = os.path.join(hdf5_dir, filename)
                 for d, (s, _) in datasets.items():
                     layouts[d][i*s[0]:(i+1)*s[0]] = h5py.VirtualSource(file_path, d, s)
-            
+
             # create virtual dataset
             with h5py.File(vds_path, "w") as h5_file:
                 h5_file.attrs['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -368,7 +371,7 @@ class BBBC021:
 
             # extract plate
             plate_dir = extract_plate(plate)
-            
+
             # create plate hdf5 file
             channels_tqdm.set_description('Creating hdf5 dataset')
             h5_file_path = os.path.join(hdf5_dir, "{}.h5".format(plate))
@@ -376,7 +379,7 @@ class BBBC021:
                 h5_file.attrs['timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 h5_file.attrs['info'] = h5py.version.info
                 h5_file.create_dataset(
-                    "images", 
+                    "images",
                     (n_images,) + BBBC021.IMG_SHAPE,
                     np.float16
                 )
@@ -387,13 +390,13 @@ class BBBC021:
                 h5_file.create_dataset("compound", (n_images,), h5py.string_dtype(encoding='utf-8'))
                 h5_file.create_dataset("concentration", (n_images,), np.float16)
                 h5_file.create_dataset("moa", (n_images,), h5py.string_dtype(encoding='utf-8'))
-            
+
             # process plate channels
             channels_tqdm.set_description('Channels')
             for c, channel in enumerate(BBBC021.CHANNELS):
                 process_channel(channel, plate_df, plate_dir, h5_file_path)
                 channels_tqdm.update(1)
-            
+
             # save metadata
             channels_tqdm.set_description('Saving metadata')
             with h5py.File(h5_file_path, 'a') as h5_file:
