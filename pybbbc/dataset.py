@@ -1,5 +1,5 @@
 """
-Functions for ownloading and compiling the BBBC021 dataset
+Functions for downloading and compiling the BBBC021 dataset
 """
 
 import re
