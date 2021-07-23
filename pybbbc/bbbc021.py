@@ -146,7 +146,9 @@ class BBBC021:
         return self.dataset["moa"][self.index_vector]
 
     @staticmethod
-    def make_dataset(root_path: Union[str, Path] = "~/.cache/"):
+    def make_dataset(
+        root_path: Union[str, Path] = "~/.cache/", max_workers: int = 4
+    ):
         """Creates a virtual HDF5 dataset with preprocessed images and metadata.
 
         Data should be previously downloaded using BBBC021.download_raw_data().
@@ -157,7 +159,7 @@ class BBBC021:
                 Default is `~/.cache/`
         """
 
-        make_dataset(root_path)
+        make_dataset(root_path, max_workers=max_workers)
 
     @staticmethod
     def download(root_path: Union[str, Path] = "~/.cache/"):

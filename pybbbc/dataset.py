@@ -69,7 +69,7 @@ def download(root_path: Union[str, Path]):
         pbar.close()
 
 
-def make_dataset(root_path: Union[str, Path], max_workers: int = 8):
+def make_dataset(root_path: Union[str, Path], max_workers: int):
     """Creates a virtual HDF5 dataset with preprocessed images and metadata.
 
     Data should be previously downloaded using BBBC021.download_raw_data().
