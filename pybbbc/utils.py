@@ -1,3 +1,7 @@
+"""
+Helper functions for working with paths, downloading files, etc.
+"""
+
 import os
 from pathlib import Path
 from typing import Dict, Union
@@ -56,12 +60,8 @@ def download_file(url: str, dst_dir: Union[Path, str] = "."):
     file_path = dst_dir / filename
 
     if file_path.exists():
-        print(file_path, "exists")
         pbar.close()
         return file_path
-    else:
-        print(file_path, "does not exist")
-        # raise Exception
 
     try:
         urlretrieve(url, file_path, reporthook=bar_update)

@@ -136,7 +136,7 @@ def get_metadata(moa_df: pd.DataFrame, image_df: pd.DataFrame) -> pd.DataFrame:
     """
 
     image_df["Image_Metadata_Site"] = image_df.Image_FileName_DAPI.transform(
-        lambda x: int(re.search("_s[1-4]_", x).group()[2])
+        lambda x: int(re.search("_s[1-4]_", x).group()[2])  # type: ignore
     )
     return (
         image_df.merge(
