@@ -154,14 +154,19 @@ class BBBC021:
         Get metadata for compound at `index`.
         """
 
-        site = self.dataset["site"][index]
-        well = self.dataset["well"][index].decode("utf-8")
-        replicate = self.dataset["replicate"][index]
-        plate = self.dataset["plate"][index].decode("utf-8")
+        row = self.image_df.iloc[index]
 
-        compound = self.dataset["compound"][index].decode("utf-8")
-        concentration = self.dataset["concentration"][index]
-        moa = self.dataset["moa"][index].decode("utf-8")
+        site, well, replicate, plate, compound, concentration, moa = row[
+            [
+                "site",
+                "well",
+                "replicate",
+                "plate",
+                "compound",
+                "concentration",
+                "moa",
+            ]
+        ]
 
         metadata = Metadata(
             Plate(site, str(well), replicate, plate),
