@@ -3,15 +3,19 @@ BBBC021 class definition for creating and working with BBBC021 dataset.
 """
 
 from collections import namedtuple
+from functools import cached_property
 from pathlib import Path
 from typing import Tuple, Union
 
 import h5py
+import janitor
 import numpy as np
+import pandas as pd
 
 from pybbbc import constants
 
 from .dataset import download, make_dataset
+from .utils import get_paths
 
 Metadata = namedtuple("Metadata", ["plate", "compound"])
 Plate = namedtuple("Plate", ["site", "well", "replicate", "plate"])
@@ -51,7 +55,7 @@ class BBBC021:
     COMPOUNDS = constants.COMPOUNDS
     MOA = constants.MOA
 
-    def __init__(self, path="~/.cache/bbbc021/bbbc021.h5", **kwargs):
+    def __init__(self, root_path="~/.cache/", **kwargs):
         """Initializes the BBBC021 dataset.
 
         Args:
@@ -62,16 +66,22 @@ class BBBC021:
         Returns: instance of the BBBC021 dataset
         """
 
-        path = Path(path).expanduser()
+        root_path = Path(root_path).expanduser()
 
-        if not path.exists():
+        self.root_path = root_path
+
+        self._paths = get_paths(root_path)
+
+        compiled_hdf5_path = self._paths["compiled_hdf5"]
+
+        if not compiled_hdf5_path.exists():
             raise RuntimeError(
                 "Dataset not found at '{}'.\n Use BBBC021.download() to "
                 "download raw data and BBBC021.make_dataset() to preprocess "
-                "and create the dataset.".format(path)
+                "and create the dataset.".format(compiled_hdf5_path)
             )
 
-        self.dataset = h5py.File(path, "r")
+        self.dataset = h5py.File(compiled_hdf5_path, "r")
         self.index_vector = np.arange(
             self.dataset["moa"].shape[0]  # pylint: disable=no-member
         )
@@ -94,6 +104,50 @@ class BBBC021:
                 self.index_vector = self.index_vector[
                     np.where(self.dataset[k][self.index_vector] == v)[0]
                 ]
+
+    @cached_property
+    def image_df(self) -> pd.DataFrame:
+        def bytes_to_str(bts):
+            return bts.decode("utf-8")
+
+        return (
+            pd.DataFrame(
+                dict(
+                    site=self.sites,
+                    well=self.wells,
+                    replicate=self.replicates,
+                    plate=self.plates,
+                    compound=self.compounds,
+                    concentration=self.concentrations,
+                    moa=self.moa,
+                )
+            )
+            .transform_column("well", bytes_to_str)
+            .transform_column("plate", bytes_to_str)
+            .transform_column("compound", bytes_to_str)
+            .transform_column("moa", bytes_to_str)
+        ).astype(
+            dict(
+                well="category",
+                plate="category",
+                compound="category",
+                moa="category",
+            )
+        )
+
+    @cached_property
+    def moa_df(self) -> pd.DataFrame:
+        """
+        Return a 3 column `DataFrame` with every combination of compound,
+        concentration, and mechanism-of-action.
+        Includes compounds with unknown MoA.
+        """
+        return (
+            self.image_df[["compound", "concentration", "moa"]]
+            .drop_duplicates()
+            .sort_values(["compound", "concentration"])
+            .reset_index(drop=True)
+        )
 
     def metadata(self, index) -> Metadata:
         """

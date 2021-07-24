@@ -84,13 +84,14 @@ def make_dataset(root_path: Union[str, Path], max_workers: int):
 
     paths = get_paths(root_path)
 
-    data_dir, raw_data_dir, hdf5_dir = (
+    data_dir, raw_data_dir, indiv_hdf5_dir, compiled_hdf5_path = (
         paths["data"],
         paths["raw_data"],
-        paths["hdf5"],
+        paths["indiv_hdf5"],
+        paths["compiled_hdf5"],
     )
 
-    hdf5_dir.mkdir(exist_ok=True, parents=True)
+    indiv_hdf5_dir.mkdir(exist_ok=True, parents=True)
 
     # process metadata
     moa_df, image_df = load_metadata(raw_data_dir)
@@ -104,7 +105,7 @@ def make_dataset(root_path: Union[str, Path], max_workers: int):
         partial(
             process_plate,
             data_dir=data_dir,
-            hdf5_dir=hdf5_dir,
+            hdf5_dir=indiv_hdf5_dir,
             metadata_df=metadata_df,
         ),
         plates,
@@ -113,9 +114,7 @@ def make_dataset(root_path: Union[str, Path], max_workers: int):
 
     # create virtual hdf5 dataset
 
-    file_path = data_dir / "bbbc021.h5"
-
-    make_virtual_dataset(file_path, hdf5_dir, len(metadata_df))
+    make_virtual_dataset(compiled_hdf5_path, indiv_hdf5_dir, len(metadata_df))
 
 
 def load_metadata(raw_data_dir: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:

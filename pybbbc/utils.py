@@ -32,13 +32,16 @@ def get_paths(root_dir: Union[str, Path]) -> Dict[str, Path]:
 
     images_dir = raw_data_dir / "images"
 
-    hdf5_dir = data_dir / "hdf5"
+    indiv_hdf5_dir = data_dir / "hdf5"
+
+    compiled_hdf5_path = data_dir / "bbbc021.h5"
 
     return dict(
         root=root_dir,
         data=data_dir,
         raw_data=raw_data_dir,
-        hdf5=hdf5_dir,
+        indiv_hdf5=indiv_hdf5_dir,
+        compiled_hdf5=compiled_hdf5_path,
         images=images_dir,
     )
 

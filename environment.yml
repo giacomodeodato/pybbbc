@@ -9,6 +9,7 @@ dependencies:
   - numpy
   - scikit-image
   - scipy
+  - pyjanitor
 
   - mypy
   - pylint
