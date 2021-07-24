@@ -11,6 +11,7 @@ import h5py
 import janitor
 import numpy as np
 import pandas as pd
+from numpy.lib.arraysetops import isin
 
 from pybbbc import constants
 
@@ -86,24 +87,23 @@ class BBBC021:
             self.dataset["moa"].shape[0]  # pylint: disable=no-member
         )
 
+        # filter dataset based on kwargs query
+
         for k, v in kwargs.items():
-            if (
-                isinstance(v, list)
-                or isinstance(v, tuple)
-                or isinstance(v, set)
-            ):
-                bool_vector = np.zeros_like(self.index_vector)
-                for e in v:
-                    bool_vector = bool_vector + np.array(
-                        self.dataset[k][self.index_vector] == e
-                    )
-                self.index_vector = self.index_vector[
-                    np.nonzero(bool_vector)[0]
-                ]
-            else:
-                self.index_vector = self.index_vector[
-                    np.where(self.dataset[k][self.index_vector] == v)[0]
-                ]
+            if not isinstance(v, (list, tuple, set)):
+                v = [v]
+
+            bool_vector = np.zeros_like(self.index_vector)
+
+            for e in v:
+                if isinstance(e, str):
+                    e = bytes(e, "utf-8")
+
+                bool_vector = bool_vector + np.array(
+                    self.dataset[k][self.index_vector] == e
+                )
+
+            self.index_vector = self.index_vector[np.flatnonzero(bool_vector)]
 
     @cached_property
     def image_df(self) -> pd.DataFrame:
@@ -185,33 +185,37 @@ class BBBC021:
 
     @property
     def images(self):
+        """
+        NOTE: This will load the entirety of the selected BBBC021 subset into
+        memory.
+        """
         return self.dataset["images"][self.index_vector]
 
-    @property
+    @cached_property
     def sites(self):
         return self.dataset["site"][self.index_vector]
 
-    @property
+    @cached_property
     def wells(self):
         return self.dataset["well"][self.index_vector]
 
-    @property
+    @cached_property
     def replicates(self):
         return self.dataset["replicate"][self.index_vector]
 
-    @property
+    @cached_property
     def plates(self):
         return self.dataset["plate"][self.index_vector]
 
-    @property
+    @cached_property
     def compounds(self):
         return self.dataset["compound"][self.index_vector]
 
-    @property
+    @cached_property
     def concentrations(self):
         return self.dataset["concentration"][self.index_vector]
 
-    @property
+    @cached_property
     def moa(self):
         return self.dataset["moa"][self.index_vector]
 
