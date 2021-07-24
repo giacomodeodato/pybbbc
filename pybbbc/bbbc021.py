@@ -2,8 +2,9 @@
 BBBC021 class definition for creating and working with BBBC021 dataset.
 """
 
+from collections import namedtuple
 from pathlib import Path
-from typing import Union
+from typing import Tuple, Union
 
 import h5py
 import numpy as np
@@ -11,6 +12,10 @@ import numpy as np
 from pybbbc import constants
 
 from .dataset import download, make_dataset
+
+Metadata = namedtuple("Metadata", ["plate", "compound"])
+Plate = namedtuple("Plate", ["site", "well", "replicate", "plate"])
+Compound = namedtuple("Compound", ["compound", "concentration", "moa"])
 
 
 class BBBC021:
@@ -67,7 +72,9 @@ class BBBC021:
             )
 
         self.dataset = h5py.File(path, "r")
-        self.index_vector = np.arange(self.dataset["moa"].shape[0])
+        self.index_vector = np.arange(
+            self.dataset["moa"].shape[0]  # pylint: disable=no-member
+        )
 
         for k, v in kwargs.items():
             if (
@@ -88,11 +95,10 @@ class BBBC021:
                     np.where(self.dataset[k][self.index_vector] == v)[0]
                 ]
 
-    def __getitem__(self, index):
-
-        index = self.index_vector[index]
-
-        img = self.dataset["images"][index].astype(np.float32)
+    def metadata(self, index) -> Metadata:
+        """
+        Get metadata for compound at `index`.
+        """
 
         site = self.dataset["site"][index]
         well = self.dataset["well"][index].decode("utf-8")
@@ -103,10 +109,20 @@ class BBBC021:
         concentration = self.dataset["concentration"][index]
         moa = self.dataset["moa"][index].decode("utf-8")
 
-        metadata = (
-            (site, str(well), replicate, plate),
-            (compound, concentration, moa),
+        metadata = Metadata(
+            Plate(site, str(well), replicate, plate),
+            Compound(compound, concentration, moa),
         )
+
+        return metadata
+
+    def __getitem__(self, index) -> Tuple[np.ndarray, Metadata]:
+
+        index = self.index_vector[index]
+
+        img = self.dataset["images"][index].astype(np.float32)
+
+        metadata = self.metadata(index)
 
         return img, metadata
 
