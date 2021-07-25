@@ -11,12 +11,11 @@ import h5py
 import janitor
 import numpy as np
 import pandas as pd
-from numpy.lib.arraysetops import isin
 
 from pybbbc import constants
 
 from .dataset import download, make_dataset
-from .utils import get_paths
+from .utils import bytes_to_str, get_paths
 
 Metadata = namedtuple("Metadata", ["plate", "compound"])
 Plate = namedtuple("Plate", ["site", "well", "replicate", "plate"])
@@ -107,8 +106,6 @@ class BBBC021:
 
     @cached_property
     def image_df(self) -> pd.DataFrame:
-        def bytes_to_str(bts):
-            return bts.decode("utf-8")
 
         return (
             pd.DataFrame(
@@ -120,12 +117,9 @@ class BBBC021:
                     compound=self.compounds,
                     concentration=self.concentrations,
                     moa=self.moa,
+                    image_idx=self.index_vector,
                 )
             )
-            .transform_column("well", bytes_to_str)
-            .transform_column("plate", bytes_to_str)
-            .transform_column("compound", bytes_to_str)
-            .transform_column("moa", bytes_to_str)
         ).astype(
             dict(
                 well="category",
@@ -202,7 +196,7 @@ class BBBC021:
 
     @cached_property
     def wells(self):
-        return self.dataset["well"][self.index_vector]
+        return bytes_to_str(self.dataset["well"][self.index_vector])
 
     @cached_property
     def replicates(self):
@@ -210,11 +204,11 @@ class BBBC021:
 
     @cached_property
     def plates(self):
-        return self.dataset["plate"][self.index_vector]
+        return bytes_to_str(self.dataset["plate"][self.index_vector])
 
     @cached_property
     def compounds(self):
-        return self.dataset["compound"][self.index_vector]
+        return bytes_to_str(self.dataset["compound"][self.index_vector])
 
     @cached_property
     def concentrations(self):
@@ -222,7 +216,7 @@ class BBBC021:
 
     @cached_property
     def moa(self):
-        return self.dataset["moa"][self.index_vector]
+        return bytes_to_str(self.dataset["moa"][self.index_vector])
 
     @staticmethod
     def make_dataset(

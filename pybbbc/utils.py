@@ -4,10 +4,11 @@ Helper functions for working with paths, downloading files, etc.
 
 import os
 from pathlib import Path
-from typing import Dict, Union
+from typing import Dict, Iterable, Union
 from urllib.error import HTTPError
 from urllib.request import urlretrieve
 
+import numpy as np
 from tqdm.auto import tqdm
 
 
@@ -21,6 +22,15 @@ def gen_bar_updater(desc=None, leave=False):
         pbar.update(progress_bytes - pbar.n)
 
     return bar_update
+
+
+def bytes_to_str(bts: Union[bytes, Iterable[bytes]]) -> Union[str, np.ndarray]:
+    if isinstance(bts, bytes):
+        bts = [bts]
+
+    strings = np.array([el.decode("utf-8") for el in bts])
+
+    return strings[0] if len(strings) == 1 else strings
 
 
 def get_paths(root_dir: Union[str, Path]) -> Dict[str, Path]:
