@@ -17,7 +17,7 @@ from pybbbc import constants
 from .dataset import download, make_dataset
 from .utils import bytes_to_str, get_paths
 
-Metadata = namedtuple("Metadata", ["plate", "compound"])
+Metadata = namedtuple("Metadata", ["plate", "compound", "image_idx"])
 Plate = namedtuple("Plate", ["site", "well", "replicate", "plate"])
 Compound = namedtuple("Compound", ["compound", "concentration", "moa"])
 
@@ -150,7 +150,16 @@ class BBBC021:
 
         row = self.image_df.iloc[index]
 
-        site, well, replicate, plate, compound, concentration, moa = row[
+        (
+            site,
+            well,
+            replicate,
+            plate,
+            compound,
+            concentration,
+            moa,
+            image_idx,
+        ) = row[
             [
                 "site",
                 "well",
@@ -159,12 +168,14 @@ class BBBC021:
                 "compound",
                 "concentration",
                 "moa",
+                "image_idx",
             ]
         ]
 
         metadata = Metadata(
             Plate(site, str(well), replicate, plate),
             Compound(compound, concentration, moa),
+            image_idx,
         )
 
         return metadata
