@@ -39,6 +39,13 @@ class BBBC021:
             List of compounds.
         MOA : list
             List of Mechanisms of Action.
+        index_vector : np.ndarray vector
+            Vector of the absolute image indices of selected subset of BBBC021
+            dataset 0...N where N is the number of images in the entirety of
+            BBBC021 (including null MoA).
+        image_df : pd.DataFrame
+            Metadata for the subset of images that were selected in the form
+            of a `DataFrame`.
 
     Methods:
         make_dataset(data_path=None)
@@ -106,6 +113,19 @@ class BBBC021:
 
     @cached_property
     def image_df(self) -> pd.DataFrame:
+        """
+        Returns:
+            Dataframe with columns:
+                image_idx: the index of a given image in the original,
+                    unfiltered BBBC021 dataset.
+                relative_image_idx: assuming the BBBC021 dataset has been
+                    filtered with selectors, the new index to access this image
+                    as in:
+                    ```python
+                    bbbc021_subset = BBBC021(moa=['null'])
+                    image, metadata = bbbc021_subset[relative_idx]
+                    ```
+        """
 
         return (
             pd.DataFrame(
@@ -118,6 +138,7 @@ class BBBC021:
                     concentration=self.concentrations,
                     moa=self.moa,
                     image_idx=self.index_vector,
+                    relative_image_idx=np.arange(len(self)),
                 )
             )
         ).astype(
@@ -143,12 +164,17 @@ class BBBC021:
             .reset_index(drop=True)
         )
 
-    def metadata(self, index) -> Metadata:
+    def metadata(self, rel_index) -> Metadata:
         """
-        Get metadata for compound at `index`.
+        Get metadata for the given image at `rel_index`.
+
+        Args:
+            rel_index: Relative image index 0...N where N is the number of
+                images in the subset of the BBBC021 dataset you've selected
+                when you created the `BBBC021` object.
         """
 
-        row = self.image_df.iloc[index]
+        row = self.image_df.iloc[rel_index]
 
         (
             site,
@@ -180,13 +206,13 @@ class BBBC021:
 
         return metadata
 
-    def __getitem__(self, index) -> Tuple[np.ndarray, Metadata]:
+    def __getitem__(self, rel_index) -> Tuple[np.ndarray, Metadata]:
 
-        index = self.index_vector[index]
+        abs_index = self.index_vector[rel_index]
 
-        img = self.dataset["images"][index].astype(np.float32)
+        img = self.dataset["images"][abs_index].astype(np.float32)
 
-        metadata = self.metadata(index)
+        metadata = self.metadata(rel_index)
 
         return img, metadata
 
