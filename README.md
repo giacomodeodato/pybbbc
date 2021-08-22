@@ -1,7 +1,7 @@
 <p align="center">
     <img src="images/example_image.png" width="200" title="Image sample" />
     <img src="images/actin.png" width="200" title="Actin" />
-    <img src="images/tubulin.png" width="200" title="Tubulin" /> 
+    <img src="images/tubulin.png" width="200" title="Tubulin" />
     <img src="images/DAPI.png" width="200" title="DAPI" />
 </p>
 
@@ -11,6 +11,24 @@ This is a python interface to the BBBC021 dataset of cellular images ([Caie et a
 The dataset is made of 13,200 fields of view imaged in three channels of resolution 1024x1280 and the corresponding metadata: site, well, replicate, plate, compound, concentration and mechanism of action (MoA).
 
 The images are of MCF-7 breast cancer cells treated for 24 h with a collection of 113 small molecules at eight concentrations. The cells were fixed, labeled for DNA, F-actin, and Β-tubulin, and imaged by fluorescent microscopy. The complete description of the dataset can be found [here](https://bbbc.broadinstitute.org/BBBC021).
+
+## Installation
+
+### With pip
+
+```bash
+pip install git+https://github.com/giacomodeodato/pybbbc.git
+```
+
+### For development (with conda)
+
+```bash
+git clone git+https://github.com/giacomodeodato/pybbbc.git
+cd pybbbc
+conda env update
+conda activate pybbbc
+pre-commit install
+```
 
 ## Usage
 An instance of the dataset can be easily created with the following code:
@@ -28,7 +46,7 @@ metadata = (
         well,
         replicate,
         plate
-    ), 
+    ),
     ( # compound metadata
         compound,
         concentration,
@@ -77,7 +95,7 @@ from pybbbc import BBBC021
 
 BBBC021.download()
 ```
-This will automatically create the data folder in the current working directory and download images and metadata (this may take several hours). Alternatively, it is possible to specify the ```data_path``` parameter to set the destination folder.
+This will automatically create the data folder in `~/.cache/` (by default) and download images and metadata (this may take several hours). Alternatively, it is possible to specify the ```data_path``` parameter to set the destination folder.
 
 ## Dataset creation
 After downloading the raw data, the preprocessed dataset can be created by calling the static method ```make_dataset()```.
@@ -101,17 +119,17 @@ def correct_illumination(images, sigma=500, min_percentile=0.02):
 
     # calculate average of images belonging to the same site and plate
     img_avg = images.mean(axis=0)
-    
+
     # apply Gaussian filter
     img_mask = gaussian_filter(img_avg, sigma=sigma)
-    
+
     # calculate robust minimum
     robust_min = np.percentile(img_mask[img_mask > 0], min_percentile)
-    
+
     # clip and scale pixel intensities
     img_mask[img_mask < robust_min] = robust_min
     img_mask = img_mask / robust_min
-    
+
     # return corrected images
     return images / img_mask
 ```

@@ -1,0 +1,2 @@
+https://data.broadinstitute.org/bbbc/BBBC021/BBBC021_v1_image.csv
+https://data.broadinstitute.org/bbbc/BBBC021/BBBC021_v1_moa.csv

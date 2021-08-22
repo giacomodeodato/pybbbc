@@ -1,0 +1,22 @@
+name: pybbbc
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python
+  - pandas
+  - h5py
+  - numpy
+  - scikit-image
+  - scipy
+  - pyjanitor
+
+  - mypy
+  - pylint
+  - flake8
+  - black
+  - pre-commit
+
+  - pip
+  - pip:
+    - '-e .'
