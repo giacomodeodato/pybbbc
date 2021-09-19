@@ -20,7 +20,21 @@ def correct_illumination(
 
 
 def scale_pixel_intensity(images: np.ndarray) -> np.ndarray:
+    """
+    Scale image intensities from [0...1] such that 0 represents the 0.1th
+    percentile and 1 the 99.9th percentile intensity in the original image.
+
+    Intensities are clipped from [0, inf].
+
+    Args:
+        images:
+
+    Returns:
+        Copy of `images` with pixel intensities rescaled.
+    """
     low = np.percentile(images, 0.1)
     high = np.percentile(images, 99.9)
+
     images = (images - low) / (high - low)
-    return np.clip(images, 0, 1)
+
+    return np.clip(images, 0, None)

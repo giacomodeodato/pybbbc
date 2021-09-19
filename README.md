@@ -51,10 +51,12 @@ metadata = (
         compound,
         concentration,
         moa
-    )
+    ),
+    image_idx
 )
 ```
-
+where `image_idx` is the absolute index of the image in the BBBC021 dataset
+without filtering applied.
 
 ### Filtering
 The instance of a dataset can be intuitively filtered during the initiation using metadata keyword arguments as follows:
