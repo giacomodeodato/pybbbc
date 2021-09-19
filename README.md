@@ -51,16 +51,22 @@ metadata = (
         compound,
         concentration,
         moa
-    )
+    ),
+    image_idx
 )
 ```
-
+where `image_idx` is the absolute index of the image in the BBBC021 dataset
+without filtering applied.
 
 ### Filtering
 The instance of a dataset can be intuitively filtered during the initiation using metadata keyword arguments as follows:
 ```python
-# get the samples without MoA
-bbbc021 = BBBC021(moa='null')
+# get the samples without known MoA
+bbbc021_null = BBBC021(moa='null')
+```
+```python
+# get only samples with known MoAs
+bbbc021_moa = BBBC021(moa=[moa for moa in BBBC021.MOA if moa != "null"])
 ```
 or using a list of metadata values:
 ```python
@@ -86,6 +92,72 @@ img = bbbc021.images[0]
 # bbbc021.compounds
 # bbbc021.concentrations
 # bbbc021.moa
+```
+
+### View the metadata `DataFrame`s
+
+The metadata is compiled into two Pandas `DataFrame`s, `image_df` and `moa_df`,
+which contain only metadata from the selected subset of the BBBC021 dataset.
+
+`image_df` contains metadata information on an individual image level.
+Each row corresponds to an image in the subset of BBBC021 you selected:
+
+```python
+> bbbc021_moa.image_df
+
+      site well  replicate        plate compound  concentration  \
+0        1  B05          1  Week5_28901     AZ-J       1.000000
+1        1  B04          1  Week5_28901     AZ-J       3.000000
+2        1  B03          1  Week5_28901     AZ-J      10.000000
+3        1  B11          1  Week5_28901    taxol       0.300049
+4        1  C11          1  Week5_28901    taxol       0.300049
+...    ...  ...        ...          ...      ...            ...
+3843     4  C02          1  Week4_27481     DMSO       0.000000
+3844     4  D02          1  Week4_27481     DMSO       0.000000
+3845     4  E11          1  Week4_27481     DMSO       0.000000
+3846     4  F11          1  Week4_27481     DMSO       0.000000
+3847     4  G11          1  Week4_27481     DMSO       0.000000
+
+                          moa  image_idx  relative_image_idx
+0                  Epithelial         45                   0
+1                  Epithelial         46                   1
+2                  Epithelial         47                   2
+3     Microtubule stabilizers         48                   3
+4     Microtubule stabilizers         49                   4
+...                       ...        ...                 ...
+3843                     DMSO      13195                3843
+3844                     DMSO      13196                3844
+3845                     DMSO      13197                3845
+3846                     DMSO      13198                3846
+3847                     DMSO      13199                3847
+
+[3848 rows x 9 columns]
+```
+
+`image_idx` corresponds to the absolute index of the image in the full BBBC021 dataset.
+`relative_image_idx` is the index you would use to access the given image as in:
+
+`image, metadata = your_bbbc021_obj[relative_image_idx]`
+
+`moa_df` is a metadata `DataFrame` which provides you with all the compound-concentration pairs in the selected BBBC021 subset:
+
+```python
+> bbbc021_moa.moa_df
+
+        compound  concentration                        moa
+0           ALLN       3.000000        Protein degradation
+1           ALLN     100.000000        Protein degradation
+2           AZ-A       0.099976   Aurora kinase inhibitors
+3           AZ-A       0.300049   Aurora kinase inhibitors
+4           AZ-A       1.000000   Aurora kinase inhibitors
+..           ...            ...                        ...
+99   vincristine       0.029999  Microtubule destabilizers
+100  vincristine       0.099976  Microtubule destabilizers
+101  vincristine       0.300049  Microtubule destabilizers
+102  vincristine       1.000000  Microtubule destabilizers
+103  vincristine       3.000000  Microtubule destabilizers
+
+[104 rows x 3 columns]
 ```
 
 ## Data download

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Tuple, Union
 
 import h5py
-import janitor
+import janitor  # noqa: F401
 import numpy as np
 import pandas as pd
 
